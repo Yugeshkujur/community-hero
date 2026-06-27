@@ -1,0 +1,28 @@
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-sans overflow-x-hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .map-bg {
+    background-color: #e5e5f7;
+    background-image: repeating-radial-gradient(circle at 0 0, transparent 0, #e5e5f7 10px),
+                      repeating-linear-gradient(#e1e2ed, #e1e2ed);
+  }
+}

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Report Issue - Community Hero</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "surface-container-highest": "#e1e2ed",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "background": "#faf8ff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "inverse-on-surface": "#f0f0fb",
+                        "secondary-container": "#86f2e4",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "secondary": "#006a61",
+                        "on-background": "#191b23",
+                        "outline-variant": "#c3c6d7",
+                        "on-primary-fixed": "#00174b",
+                        "on-secondary-fixed": "#00201d",
+                        "on-tertiary-fixed": "#191c1e",
+                        "inverse-primary": "#b4c5ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#faf8ff",
+                        "surface-container-low": "#f3f3fe",
+                        "surface-dim": "#d9d9e5",
+                        "outline": "#737686",
+                        "primary": "#004ac6",
+                        "on-surface-variant": "#434655",
+                        "on-tertiary-container": "#eff1f3",
+                        "inverse-surface": "#2e3039",
+                        "surface-container": "#ededf9",
+                        "primary-fixed": "#dbe1ff",
+                        "primary-container": "#2563eb",
+                        "tertiary-container": "#6b6e70",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-fixed": "#89f5e7",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e7f3",
+                        "tertiary": "#525657",
+                        "surface-variant": "#e1e2ed",
+                        "on-secondary-container": "#006f66",
+                        "on-surface": "#191b23",
+                        "surface-tint": "#0053db",
+                        "on-primary-container": "#eeefff",
+                        "surface": "#faf8ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#005049"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "32px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter-mobile": "12px",
+                        "stack-gap": "16px",
+                        "touch-target-min": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[style*="font-variation-settings: 'FILL' 1"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg min-h-screen pb-[90px] pt-14 selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface text-primary dark:text-inverse-primary fixed top-0 left-0 w-full bg-surface-container dark:bg-inverse-surface shadow-sm shadow-sm flex items-center justify-between px-margin-mobile h-14 w-full z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="location_city">location_city</span>
+<span class="font-headline-md text-headline-md-mobile font-headline-md text-headline-md text-primary dark:text-inverse-primary font-bold">Community Hero</span>
+</div>
+<div class="flex items-center gap-2 hover:bg-surface-container-high transition-colors active:scale-95 duration-150 p-2 rounded-lg cursor-pointer">
+<span class="font-label-lg text-label-lg">West End Ward</span>
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</header>
+<main class="px-margin-mobile pt-stack-gap flex flex-col gap-section-gap pb-section-gap">
+<!-- Photo Capture / Preview Area -->
+<section class="flex flex-col gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Evidence</h2>
+<div class="relative w-full aspect-video rounded-xl overflow-hidden shadow-sm bg-surface-container-high group">
+<img class="w-full h-full object-cover" data-alt="A clear, high-resolution smartphone photo showing a broken, leaning streetlight post on a residential suburban street during daytime. The sky is clear, and the surrounding environment includes a sidewalk and trees. The image style is realistic, objective, and documentary, resembling a user-submitted civic report photo within a modern, light-mode public service application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt_GGqdd1GRdLhN4yFxbB71kBIyibqMjuCrOG9vTEDpK84PNvCxxaXaHVtnbJlov-P1UwyXfiWgwxGr4aqDAnlKSQyFkvhfJBnPCaBxPBhe-qGGreVSAiplJ_ovShO60iafCOmd_KBqEuFmWiBqYlv3FmJbB0TtN0QPp3vryKE_OAofCqPpm8se22Uo-FeTx4Glp_N_6ZPJNtKfRhMQsl6W7EaL5S2bG3Na9Nm0hiH-GVl-ID9e3T_1CP5-a50zuNqEO9Q7dkkCwTE"/>
+<button class="absolute top-4 right-4 bg-surface/80 backdrop-blur-md text-on-surface p-2 rounded-full shadow-sm hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+<span class="bg-surface/80 backdrop-blur-md text-on-surface font-label-sm text-label-sm px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                        Retake Photo
+                    </span>
+</div>
+</div>
+</section>
+<!-- Location Overlay -->
+<section class="flex flex-col gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Location</h2>
+<div class="relative w-full h-32 rounded-xl overflow-hidden shadow-sm border border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A stylized, modern, light-mode map interface showing a suburban neighborhood street network. The map uses a soft color palette with light gray roads and pale blue accents. A clear, blue circular pin marker with a white dot in the center indicates a specific location on a street corner, representing the site of the reported broken streetlight." data-location="West End Ward" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiTUyqgWh1UmCqzn9U0xYjtj4GVgQCEIFXJJYKq3bW_JNIzMFXUjspMPu6fEkomoeT628OGN6ix8M0JLfIdEzYpBrgUUsSR08dXof0Rko58vEWeRZhbepj6L3E5O9Hrtp17ELtHoaR6wZgwdNqi-ZOvAUONkFFTpBd5UA77sM8ANfrwuxIrLN82UCBJYr2JV8fKJUYqQj_PLsCrnS0Vf6RCuHjx_W93Nd4i4SQx_jCssDp9IzWCRnfzaxMO1vCFGdS6C3zwRPaWos"/>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">location_on</span>
+</div>
+<button class="absolute bottom-2 right-2 bg-surface text-on-surface p-2 rounded-full shadow-sm hover:bg-surface-container-high transition-colors pointer-events-auto">
+<span class="material-symbols-outlined text-[20px]">my_location</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">edit_location_alt</span>
+                 124 Maple Street, West End. Tap map to edit.
+             </p>
+</section>
+<!-- AI Suggested Category -->
+<section class="flex flex-col gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Category</h2>
+<div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl flex items-start justify-between shadow-sm">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<span class="font-label-lg text-label-lg text-on-surface">Broken Streetlight</span>
+</div>
+<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 font-label-sm text-label-sm px-2 py-0.5 rounded-full w-fit">
+                         Medium Severity
+                     </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-xs">AI Suggestion based on photo</p>
+</div>
+<button class="text-primary font-label-lg text-label-lg hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors">
+                     Change
+                 </button>
+</div>
+</section>
+<!-- Description -->
+<section class="flex flex-col gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Details</h2>
+<div class="relative">
+<textarea class="block w-full rounded-xl border-outline-variant bg-surface-container-lowest text-on-surface focus:border-primary focus:ring-primary font-body-lg text-body-lg placeholder-on-surface-variant resize-none" id="description" placeholder="Optional Description... (e.g., 'The glass is shattered on the sidewalk')" rows="3"></textarea>
+</div>
+</section>
+<!-- Submit Button -->
+<section class="mt-4">
+<button class="w-full bg-primary-container text-on-primary h-[56px] rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container/90 transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">send</span>
+                Submit Report
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface-container dark:bg-surface-container-lowest text-primary dark:text-primary-fixed-dim fixed bottom-0 left-0 w-full rounded-t-xl bg-surface-container dark:bg-surface-container-lowest shadow-[0_-2px_4px_rgba(0,0,0,0.05)] shadow-lg fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-2 pt-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Report</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

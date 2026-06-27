@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Issue Detail - Community Hero</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "surface-container-highest": "#e1e2ed",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "background": "#faf8ff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "inverse-on-surface": "#f0f0fb",
+                        "secondary-container": "#86f2e4",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "secondary": "#006a61",
+                        "on-background": "#191b23",
+                        "outline-variant": "#c3c6d7",
+                        "on-primary-fixed": "#00174b",
+                        "on-secondary-fixed": "#00201d",
+                        "on-tertiary-fixed": "#191c1e",
+                        "inverse-primary": "#b4c5ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#faf8ff",
+                        "surface-container-low": "#f3f3fe",
+                        "surface-dim": "#d9d9e5",
+                        "outline": "#737686",
+                        "primary": "#004ac6",
+                        "on-surface-variant": "#434655",
+                        "on-tertiary-container": "#eff1f3",
+                        "inverse-surface": "#2e3039",
+                        "surface-container": "#ededf9",
+                        "primary-fixed": "#dbe1ff",
+                        "primary-container": "#2563eb",
+                        "tertiary-container": "#6b6e70",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-fixed": "#89f5e7",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e7f3",
+                        "tertiary": "#525657",
+                        "surface-variant": "#e1e2ed",
+                        "on-secondary-container": "#006f66",
+                        "on-surface": "#191b23",
+                        "surface-tint": "#0053db",
+                        "on-primary-container": "#eeefff",
+                        "surface": "#faf8ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#005049"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "32px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter-mobile": "12px",
+                        "stack-gap": "16px",
+                        "touch-target-min": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-[80px] font-sans antialiased md:hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation (Mobile) -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface shadow-sm h-14 flex items-center justify-between px-margin-mobile">
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center -ml-3 text-on-surface hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-on-surface truncate px-2">Issue Detail</h1>
+<div class="w-touch-target-min"></div> <!-- Placeholder for balance -->
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-14 px-margin-mobile pb-section-gap space-y-stack-gap">
+<!-- Hero Image Card -->
+<div class="mt-stack-gap rounded-xl overflow-hidden bg-surface-container shadow-sm border border-outline-variant/30 aspect-video relative">
+<img class="w-full h-full object-cover" data-alt="A clear, high-resolution daytime photo of a significant water leak on a city sidewalk. Water is visibly bubbling up from a crack in the pavement, creating a small puddle. The scene is bathed in natural, bright sunlight, emphasizing the urgency of the repair. The aesthetic is realistic and documentary-style, reflecting a civic reporting context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzS92Iytur2kCW630SoNoOYo95bSbwxKvH3cDoMCwp83sW4vLEUuD5Q26pdZNhZnSGJh42sPyRCKx8EWs5iCgOCF31YlTZQ9j7n0hOcWjD20EnNRP9DRBZzEx2FWEFky7P7id7NwK_tcUsJ9I9f53McK8inhTRZ8WZ8tOyYhoIzVH3oNeJEOj4nraH2McUe8Lq5zsvwiPsDlUfxSKuF6lhFLORoKFDa-XD-eKpzN7k4rXsG3cCjvnv4MkRNqiUvG24WYPAtTlA1yjQ"/>
+<div class="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant/20 flex items-center gap-1 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Assigned</span>
+</div>
+</div>
+<!-- Header Info -->
+<div class="space-y-1">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Major Water Main Leak</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                1240 West End Avenue, near 42nd St
+            </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                Reported 2 hours ago by Sarah J.
+            </p>
+</div>
+<!-- Upvote Action -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant/30">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Is this affecting you?</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">24 citizens confirmed this.</p>
+</div>
+<button class="h-touch-target-min px-6 rounded-full border border-primary text-primary font-label-lg text-label-lg hover:bg-primary-container/10 active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">thumb_up</span>
+                 Me Too
+             </button>
+</div>
+<!-- Details Card -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-outline-variant/30 space-y-4">
+<h3 class="font-label-lg text-label-lg text-on-surface border-b border-outline-variant/20 pb-2">Issue Details</h3>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary">engineering</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Assigned to</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Public Works Dept - Water Division</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary">description</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Description</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Large volume of water bubbling up through a crack in the sidewalk near the corner. It's starting to flood the gutter and crosswalk.</p>
+</div>
+</div>
+</div>
+<!-- Vertical Stepper (Status Timeline) -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-outline-variant/30">
+<h3 class="font-label-lg text-label-lg text-on-surface mb-4">Tracking Timeline</h3>
+<div class="relative pl-6 space-y-6">
+<!-- Vertical Line -->
+<div class="absolute left-3 top-2 bottom-2 w-[2px] bg-outline-variant/30"></div>
+<!-- Step 1: Reported (Done) -->
+<div class="relative flex gap-4 items-start">
+<div class="absolute -left-[27px] w-6 h-6 rounded-full bg-primary flex items-center justify-center z-10 shadow-sm border-2 border-surface">
+<span class="material-symbols-outlined text-[14px] text-on-primary font-bold">check</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Reported</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Today, 08:15 AM</p>
+</div>
+</div>
+<!-- Step 2: Triaged (Done) -->
+<div class="relative flex gap-4 items-start">
+<div class="absolute -left-[27px] w-6 h-6 rounded-full bg-primary flex items-center justify-center z-10 shadow-sm border-2 border-surface">
+<span class="material-symbols-outlined text-[14px] text-on-primary font-bold">check</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Triaged</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Today, 08:45 AM - Categorized as High Priority.</p>
+</div>
+</div>
+<!-- Step 3: Assigned (Current) -->
+<div class="relative flex gap-4 items-start">
+<div class="absolute -left-[27px] w-6 h-6 rounded-full bg-surface border-2 border-primary flex items-center justify-center z-10 shadow-sm">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-primary font-bold">Assigned</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Today, 09:10 AM - Sent to Public Works Dept.</p>
+</div>
+</div>
+<!-- Step 4: In Progress (Pending) -->
+<div class="relative flex gap-4 items-start opacity-50">
+<div class="absolute -left-[27px] w-6 h-6 rounded-full bg-surface border-2 border-outline-variant flex items-center justify-center z-10">
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">In Progress</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Crew on site and working.</p>
+</div>
+</div>
+<!-- Step 5: Resolved (Pending) -->
+<div class="relative flex gap-4 items-start opacity-50">
+<div class="absolute -left-[27px] w-6 h-6 rounded-full bg-surface border-2 border-outline-variant flex items-center justify-center z-10">
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Resolved</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Issue closed.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Semantic Shell mapping: intent "My Walks/Tracking" fallback, but explicitly user is tracking an issue. Since there's no direct "Tracking" tab, mapping to "Home" as the primary feed hub, as this is a detail view from the feed, but technically navigation should often be suppressed on deeply nested detail screens. However, prompt explicitly requests: "Bottom navigation visible.") -->
+<!-- Nav mapping: Exploring an issue detail often maps back to 'Map' or 'Home' where they found it. We will highlight 'Home' as the likely origin. -->
+<nav class="fixed bottom-0 left-0 w-full rounded-t-xl bg-surface-container dark:bg-surface-container-lowest shadow-[0_-2px_4px_rgba(0,0,0,0.05)] shadow-lg z-50 flex justify-around items-center px-4 pb-2 pt-2">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 duration-200">
+<span class="material-symbols-outlined fill" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 px-4 py-1 rounded-full">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile">Report</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 px-4 py-1 rounded-full">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-sm text-label-sm-mobile">Map</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 px-4 py-1 rounded-full">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm-mobile">Profile</span>
+</button>
+</nav>
+</body></html>
