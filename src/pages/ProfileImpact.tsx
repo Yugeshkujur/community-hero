@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { LEADERBOARD } from '../data/mockData';
 import { useIssues, seedDatabase } from '../hooks/useIssues';
+import { useUsers } from '../hooks/useUsers';
 import { useRole } from '../context/RoleContext';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import AvatarCustomizer from '../components/AvatarCustomizer';
 
 const TABS = ['My Reports', 'Badges', 'Leaderboard'];
 
@@ -10,6 +13,7 @@ export default function ProfileImpact() {
   const [activeTab, setActiveTab] = useState('My Reports');
   const [isSeeding, setIsSeeding] = useState(false);
   const { issues } = useIssues();
+  const { users: allUsers } = useUsers();
   const { currentUser, userData, loading } = useRole();
 
   if (loading) {
@@ -79,9 +83,64 @@ export default function ProfileImpact() {
 
   const unlockedCount = BADGES.filter(b => b.unlocked).length;
 
+  // Real Leaderboard calculation based on live issues
+  const realLeaderboard = useMemo(() => {
+    const userStats: Record<string, { id: string; name: string; reportsCount: number; resolvedCount: number; points: number; avatar: string }> = {};
+
+    issues.forEach(issue => {
+      if (!issue.citizenId) return;
+      
+      if (!userStats[issue.citizenId]) {
+        const matchedUser = allUsers.find(u => u.id === issue.citizenId);
+        userStats[issue.citizenId] = {
+          id: issue.citizenId,
+          name: matchedUser?.name || issue.citizenName || 'Unknown Citizen',
+          reportsCount: 0,
+          resolvedCount: 0,
+          points: 0,
+          avatar: matchedUser?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${issue.citizenName || issue.citizenId}`
+        };
+      }
+
+      userStats[issue.citizenId].reportsCount += 1;
+      if (issue.status === 'Resolved') {
+        userStats[issue.citizenId].resolvedCount += 1;
+      }
+    });
+
+    // Calculate points and sort
+    return Object.values(userStats)
+      .map(user => ({
+        ...user,
+        points: user.reportsCount * 50 + user.resolvedCount * 100
+      }))
+      .sort((a, b) => b.points - a.points);
+  }, [issues, allUsers]);
+
   const displayName = userData?.name || 'Citizen';
   const avatarSeed = userData?.name || 'User';
-  const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
+  const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
+  const [avatarUrl, setAvatarUrl] = useState(userData?.avatar || defaultAvatar);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+
+  const handleSaveAvatar = async (newUrl: string) => {
+    if (!uid) return;
+    setIsUploadingAvatar(true);
+    setIsCustomizerOpen(false);
+    
+    try {
+      await updateDoc(doc(db, 'users', uid), {
+        avatar: newUrl
+      });
+      setAvatarUrl(newUrl);
+    } catch (error) {
+      console.error("Failed to update avatar:", error);
+      alert("Failed to save avatar.");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   return (
     <div className="pb-10" style={{ background: 'linear-gradient(180deg, #faf8ff 0%, #f0f0fb 100%)' }}>
@@ -89,12 +148,35 @@ export default function ProfileImpact() {
       <div className="px-margin-mobile pt-stack-gap pb-section-gap max-w-2xl mx-auto">
         <div className="bg-surface-container-lowest border border-outline-variant rounded-[16px] p-4 shadow-sm flex items-center gap-4 relative overflow-hidden mb-4">
           <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
-          <div className="relative w-16 h-16 shrink-0">
-            <img className="w-full h-full object-cover rounded-full border-2 border-primary-container shadow-sm" src={avatarUrl} alt={displayName} />
+          <div 
+            className="relative w-16 h-16 shrink-0 cursor-pointer group"
+            onClick={() => setIsCustomizerOpen(true)}
+          >
+            <img 
+              className={`w-full h-full object-cover rounded-full border-2 border-primary-container shadow-sm transition-opacity ${isUploadingAvatar ? 'opacity-50' : 'group-hover:opacity-80'}`} 
+              src={avatarUrl} 
+              alt={displayName} 
+            />
+            {isUploadingAvatar ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="material-symbols-outlined animate-spin text-primary">progress_activity</span>
+              </div>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-full">
+                <span className="material-symbols-outlined text-white text-[20px]">edit</span>
+              </div>
+            )}
             <div className="absolute bottom-0 right-0 bg-primary-container text-on-primary border-2 border-surface-container-lowest rounded-full w-6 h-6 flex items-center justify-center">
               <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
             </div>
           </div>
+          
+          <AvatarCustomizer 
+            isOpen={isCustomizerOpen} 
+            onClose={() => setIsCustomizerOpen(false)} 
+            onSave={handleSaveAvatar} 
+            initialSeed={avatarSeed} 
+          />
           <div>
             <h2 className="font-headline-md text-headline-md-mobile text-on-surface">{displayName}</h2>
             <span className="font-label-sm text-label-sm text-secondary flex items-center gap-1 mt-0.5">
@@ -306,13 +388,18 @@ export default function ProfileImpact() {
         {/* Leaderboard Tab */}
         {activeTab === 'Leaderboard' && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 bg-amber-50 border border-amber-400/30 rounded-xl px-4 py-2.5 mb-3">
-              <span className="material-symbols-outlined text-amber-500 text-[18px]">info</span>
-              <p className="font-label-sm text-label-sm text-amber-700">
-                Illustrative leaderboard — a real cross-user ranking requires backend aggregation.
+            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-400/30 rounded-xl px-4 py-2.5 mb-3">
+              <span className="material-symbols-outlined text-emerald-600 text-[18px]">info</span>
+              <p className="font-label-sm text-label-sm text-emerald-800">
+                Live leaderboard driven by real civic reports.
               </p>
             </div>
-            {LEADERBOARD.map((user, i) => (
+            {realLeaderboard.length === 0 && (
+              <div className="text-center py-8 text-on-surface-variant font-body-sm text-body-sm">
+                No users on the leaderboard yet. Be the first!
+              </div>
+            )}
+            {realLeaderboard.map((user, i) => (
               <div key={user.id} className={`flex items-center gap-4 bg-surface-container-lowest border rounded-xl p-3 shadow-sm ${user.id === uid ? 'border-primary/40 bg-primary/5' : 'border-outline-variant'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${i === 0 ? 'bg-amber-400 text-white' : i === 1 ? 'bg-gray-400 text-white' : i === 2 ? 'bg-orange-400 text-white' : 'bg-surface-container text-on-surface-variant'}`}>
                   {i + 1}

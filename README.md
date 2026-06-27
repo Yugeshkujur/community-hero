@@ -5,7 +5,11 @@ Community Hero is a modern civic engagement platform built for a hackathon. It a
 ## Tech Stack
 - **Frontend:** React 18, TypeScript, Vite, Tailwind CSS
 - **Backend & Auth:** Firebase (Auth, Firestore, Storage)
+<<<<<<< HEAD
 - **AI Triage Agent:** Google Gemini (3.1-flash-lite) via `@google/generative-ai`
+=======
+- **AI Triage Agent:** Google Gemini(3.1-flash-lite) via `@google/generative-ai`
+>>>>>>> b17a7c6 (some small changes)
 - **Mapping:** React-Leaflet
 
 ## Core Features

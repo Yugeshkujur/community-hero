@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { DEPARTMENTS } from '../../data/mockData';
 import { useIssues } from '../../hooks/useIssues';
 import StatusChip from '../../components/StatusChip';
@@ -11,7 +11,9 @@ import { db } from '../../lib/firebase';
 
 export default function AuthorityQueue() {
   const { issues: mockIssues } = useIssues();
-  const [activeTab] = useState<'All' | 'Critical'>('All');
+  const [searchParams] = useSearchParams();
+  const filterParam = searchParams.get('filter');
+  const [activeTab, setActiveTab] = useState<'All' | 'Critical'>(filterParam === 'critical' ? 'Critical' : 'All');
   const [filterDept, setFilterDept] = useState<string | 'All'>('All');
 
   const filtered = mockIssues
@@ -57,6 +59,26 @@ export default function AuthorityQueue() {
             <p className="font-label-sm text-label-sm text-on-surface-variant">{dept.resolvedCount} resolved</p>
           </button>
         ))}
+      </div>
+
+      {/* Severity filter chips */}
+      <div className="flex gap-2 mb-2">
+        <button
+          onClick={() => setActiveTab('All')}
+          className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm border transition-all ${
+            activeTab === 'All' ? 'bg-primary text-on-primary border-primary' : 'bg-surface-container-lowest text-on-surface border-outline-variant hover:bg-surface-variant/30'
+          }`}
+        >
+          All Severities
+        </button>
+        <button
+          onClick={() => setActiveTab('Critical')}
+          className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm border transition-all ${
+            activeTab === 'Critical' ? 'bg-red-600 text-white border-red-600' : 'bg-surface-container-lowest text-red-600 border-outline-variant hover:bg-red-50'
+          }`}
+        >
+          Critical Only
+        </button>
       </div>
 
       {/* Dept filter chips */}

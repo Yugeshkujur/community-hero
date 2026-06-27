@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { DEPARTMENTS } from '../../data/mockData';
 import { useIssues } from '../../hooks/useIssues';
 
@@ -86,17 +87,29 @@ export default function AuthorityDashboard() {
         {[
           { label: 'Total Resolved', value: resolvedCount, icon: 'check_circle', color: 'text-emerald-600', bg: 'bg-emerald-500/10' },
           { label: 'Open Issues', value: openCount, icon: 'pending', color: 'text-orange-500', bg: 'bg-orange-500/10' },
-          { label: 'Critical Open', value: criticalOpen, icon: 'emergency', color: 'text-red-600', bg: 'bg-red-500/10' },
+          { label: 'Critical Open', value: criticalOpen, icon: 'emergency', color: 'text-red-600', bg: 'bg-red-500/10', link: '/authority?filter=critical' },
           { label: 'Avg AI Confidence', value: `${aiAccuracy}%`, icon: 'smart_toy', color: 'text-primary', bg: 'bg-primary/10' },
-        ].map(k => (
-          <div key={k.label} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
-            <div className={`w-10 h-10 rounded-full ${k.bg} flex items-center justify-center mb-3`}>
-              <span className={`material-symbols-outlined text-[20px] ${k.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>{k.icon}</span>
+        ].map(k => {
+          const CardContent = (
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm h-full hover:shadow-md transition-shadow">
+              <div className={`w-10 h-10 rounded-full ${k.bg} flex items-center justify-center mb-3`}>
+                <span className={`material-symbols-outlined text-[20px] ${k.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>{k.icon}</span>
+              </div>
+              <p className="text-2xl font-bold text-on-surface">{k.value}</p>
+              <p className="font-label-sm text-label-sm text-on-surface-variant mt-0.5">{k.label}</p>
             </div>
-            <p className="text-2xl font-bold text-on-surface">{k.value}</p>
-            <p className="font-label-sm text-label-sm text-on-surface-variant mt-0.5">{k.label}</p>
-          </div>
-        ))}
+          );
+
+          return k.link ? (
+            <Link key={k.label} to={k.link} className="block">
+              {CardContent}
+            </Link>
+          ) : (
+            <div key={k.label}>
+              {CardContent}
+            </div>
+          );
+        })}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

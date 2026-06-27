@@ -1,12 +1,40 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useRole } from '../../context/RoleContext';
 import { DEPARTMENTS } from '../../data/mockData';
+import AvatarCustomizer from '../../components/AvatarCustomizer';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 
 export default function AuthorityProfile() {
   const navigate = useNavigate();
-  const { setRole, userData } = useRole();
+  const { setRole, currentUser, userData } = useRole();
+  const uid = currentUser?.uid;
   
   const departmentName = DEPARTMENTS.find(d => d.id === userData?.departmentId)?.name || 'Government Department';
+
+  const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.name || 'Authority'}`;
+  const [avatarUrl, setAvatarUrl] = useState(userData?.avatar || defaultAvatar);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+
+  const handleSaveAvatar = async (newUrl: string) => {
+    if (!uid) return;
+    setIsUploadingAvatar(true);
+    setIsCustomizerOpen(false);
+    
+    try {
+      await updateDoc(doc(db, 'users', uid), {
+        avatar: newUrl
+      });
+      setAvatarUrl(newUrl);
+    } catch (error) {
+      console.error("Failed to update avatar:", error);
+      alert("Failed to save avatar.");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   function handleLogout() {
     setRole(null);
@@ -19,9 +47,35 @@ export default function AuthorityProfile() {
       <section className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/10 to-transparent" />
         
-        <div className="relative z-10 w-24 h-24 rounded-full border-4 border-surface shadow-md bg-primary/20 flex items-center justify-center shrink-0">
-          <span className="material-symbols-outlined text-primary text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+        <div 
+          className="relative z-10 w-24 h-24 rounded-full border-4 border-surface shadow-md bg-surface flex items-center justify-center shrink-0 cursor-pointer group"
+          onClick={() => setIsCustomizerOpen(true)}
+        >
+          <img 
+            src={avatarUrl} 
+            alt={userData?.name || 'Authority'} 
+            className={`w-full h-full object-cover rounded-full transition-opacity ${isUploadingAvatar ? 'opacity-50' : 'group-hover:opacity-80'}`} 
+          />
+          {isUploadingAvatar ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="material-symbols-outlined animate-spin text-primary text-[28px]">progress_activity</span>
+            </div>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 rounded-full">
+              <span className="material-symbols-outlined text-white text-[24px]">edit</span>
+            </div>
+          )}
+          <div className="absolute bottom-0 right-0 bg-primary text-on-primary border-2 border-surface rounded-full w-8 h-8 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+          </div>
         </div>
+        
+        <AvatarCustomizer 
+          isOpen={isCustomizerOpen} 
+          onClose={() => setIsCustomizerOpen(false)} 
+          onSave={handleSaveAvatar} 
+          initialSeed={userData?.name || 'Authority'} 
+        />
         
         <div className="relative z-10 flex-1 text-center md:text-left">
           <h2 className="font-headline-md text-headline-md text-on-surface font-bold">{userData?.name || 'Authority User'}</h2>
@@ -68,7 +122,7 @@ export default function AuthorityProfile() {
             <span className="material-symbols-outlined text-primary">history</span>
             Recent Activity
           </h3>
-          <button className="text-primary font-label-sm text-label-sm hover:underline">View All</button>
+          <Link to="/authority" className="text-primary font-label-sm text-label-sm hover:underline">View All</Link>
         </div>
         <div className="divide-y divide-outline-variant/50">
           {[
