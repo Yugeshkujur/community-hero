@@ -3,6 +3,7 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useRole } from '../context/RoleContext';
 import { useLocationContext } from '../context/LocationContext';
+import { useIssues } from '../hooks/useIssues';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -25,8 +26,7 @@ export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthority, setRole, userData } = useRole();
-
-
+  const { issues } = useIssues();
 
   function handleSwitchRole() {
     setRole(null);
@@ -74,6 +74,8 @@ export default function Layout() {
 
   // Authority layout: sidebar on desktop, bottom bar on mobile
   if (isAuthority) {
+    const criticalCount = issues.filter(i => i.severity === 'Critical' && i.status !== 'Resolved').length;
+
     return (
       <div className="min-h-screen bg-surface-container flex">
         <PermissionOverlay />
@@ -114,12 +116,14 @@ export default function Layout() {
 
             {/* Escalations */}
             <NavLink
-              to="/authority/issue/3"
+              to="/authority?filter=critical"
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">report_problem</span>
               Escalations
-              <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">1</span>
+              {criticalCount > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{criticalCount}</span>
+              )}
             </NavLink>
           </nav>
 
@@ -145,7 +149,7 @@ export default function Layout() {
         </aside>
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 min-w-0 flex flex-col min-h-screen pb-20 md:pb-0">
           {/* Top bar */}
           <header className="sticky top-0 z-[1000] bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-6 h-14 shadow-sm">
             <Link to="/" className="flex items-center gap-2 md:hidden">
@@ -154,10 +158,12 @@ export default function Layout() {
             </Link>
             <div className="hidden md:block" />
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1.5 bg-red-500/10 border border-red-400/20 text-red-600 px-3 py-1 rounded-full font-label-sm text-label-sm">
-                <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>emergency</span>
-                1 Critical
-              </span>
+              {criticalCount > 0 && (
+                <Link to="/authority?filter=critical" className="flex items-center gap-1.5 bg-red-500/10 border border-red-400/20 text-red-600 px-3 py-1 rounded-full font-label-sm text-label-sm hover:bg-red-500/20 transition-colors">
+                  <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>emergency</span>
+                  {criticalCount} Critical
+                </Link>
+              )}
               <button onClick={handleSwitchRole} className="hidden md:flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors">
                 <span className="material-symbols-outlined text-[18px]">swap_horiz</span>
                 Citizen View
@@ -172,8 +178,8 @@ export default function Layout() {
 
         {/* Mobile bottom nav */}
         <nav className="md:hidden fixed bottom-0 left-0 w-full rounded-t-xl bg-surface-container-lowest border-t border-outline-variant shadow-lg z-[1000] flex justify-around items-center px-4 pt-2 pb-safe">
-          {[...AUTHORITY_NAV, { label: 'Alerts', icon: 'report_problem', path: '/authority/issue/3' }].map(item => {
-            const isActive = item.path === '/authority' ? location.pathname === '/authority' : location.pathname.startsWith(item.path);
+          {[...AUTHORITY_NAV, { label: 'Alerts', icon: 'report_problem', path: '/authority?filter=critical' }].map(item => {
+            const isActive = item.path === '/authority' ? location.pathname === '/authority' && !location.search.includes('filter=critical') : location.pathname.startsWith(item.path) || (item.path.includes('filter=critical') && location.search.includes('filter=critical'));
             return (
               <NavLink key={item.path} to={item.path} className="flex flex-col items-center justify-center min-w-[touch-target-min] min-h-[touch-target-min] group">
                 <div className={cn('flex flex-col items-center justify-center px-4 py-1 mb-1 rounded-full transition-colors', isActive ? 'bg-secondary-container text-on-secondary-container' : 'group-hover:bg-surface-variant/30 text-on-surface-variant')}>

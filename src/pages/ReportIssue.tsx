@@ -150,6 +150,22 @@ export default function ReportIssue() {
       // 2. Determine final status based on confidence
       const finalStatus: Issue['status'] = analysis.confidence < 60 ? 'Reported' : 'Triaged';
 
+      // Reverse geocode to get a precise, readable location
+      let readableLocation = "Captured Location";
+      try {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${mapCenter[0]}&lon=${mapCenter[1]}`);
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          if (geoData && geoData.display_name) {
+            const parts = geoData.display_name.split(', ');
+            // Take first 3 parts of the address for brevity (e.g. "Main Street, Pune, Maharashtra")
+            readableLocation = parts.slice(0, 3).join(', ');
+          }
+        }
+      } catch (e) {
+        console.warn("Reverse geocoding failed", e);
+      }
+
       // 3. Construct Issue
       const issue: Issue = {
         id: newId,
@@ -158,7 +174,7 @@ export default function ReportIssue() {
         category: analysis.category as any,
         severity: analysis.severity,
         status: finalStatus as any,
-        location: "Captured Location",
+        location: readableLocation,
         lat: mapCenter[0],
         lng: mapCenter[1],
         image: base64Image || "https://placehold.co/600x400/e2e8f0/475569?text=No+Image",

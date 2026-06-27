@@ -13,11 +13,15 @@ export default function AuthorityQueue() {
   const { issues: mockIssues } = useIssues();
   const [searchParams] = useSearchParams();
   const filterParam = searchParams.get('filter');
-  const [activeTab, setActiveTab] = useState<'All' | 'Critical'>(filterParam === 'critical' ? 'Critical' : 'All');
+  const [activeTab, setActiveTab] = useState<'All' | 'Critical' | 'Resolved'>(filterParam === 'critical' ? 'Critical' : 'All');
   const [filterDept, setFilterDept] = useState<string | 'All'>('All');
 
   const filtered = mockIssues
-    .filter(i => activeTab === 'All' ? true : i.severity === 'Critical')
+    .filter(i => {
+      if (activeTab === 'Resolved') return i.status === 'Resolved';
+      if (activeTab === 'Critical') return i.severity === 'Critical' && i.status !== 'Resolved';
+      return i.status !== 'Resolved'; // 'All'
+    })
     .filter(i => filterDept === 'All' ? true : i.departmentId === filterDept)
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
@@ -29,7 +33,7 @@ export default function AuthorityQueue() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">AI-Prioritized Queue</h1>
-          <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Auto-sorted by severity & SLA risk · West End Ward</p>
+          <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Auto-sorted by severity & SLA risk</p>
         </div>
         {criticalCount > 0 && (
           <div className="flex items-center gap-2 bg-red-500/10 border border-red-400/30 text-red-600 px-3 py-2 rounded-xl font-label-sm text-label-sm font-semibold">
@@ -78,6 +82,14 @@ export default function AuthorityQueue() {
           }`}
         >
           Critical Only
+        </button>
+        <button
+          onClick={() => setActiveTab('Resolved')}
+          className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm border transition-all ${
+            activeTab === 'Resolved' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-surface-container-lowest text-emerald-600 border-outline-variant hover:bg-emerald-50'
+          }`}
+        >
+          Resolved
         </button>
       </div>
 
