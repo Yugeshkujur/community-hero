@@ -8,6 +8,7 @@ import { analyzeIssue } from '../lib/gemini';
 import { db } from '../lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { stripUndefined } from '../lib/sanitize';
+import { uploadIssueImage } from '../lib/storage';
 import type { Issue } from '../data/mockData';
 import L from 'leaflet';
 
@@ -166,6 +167,10 @@ export default function ReportIssue() {
         console.warn("Reverse geocoding failed", e);
       }
 
+      const imageUrl = base64Image
+        ? await uploadIssueImage(citizenId, newId, base64Image)
+        : "https://placehold.co/600x400/e2e8f0/475569?text=No+Image";
+
       // 3. Construct Issue
       const issue: Issue = {
         id: newId,
@@ -177,7 +182,7 @@ export default function ReportIssue() {
         location: readableLocation,
         lat: mapCenter[0],
         lng: mapCenter[1],
-        image: base64Image || "https://placehold.co/600x400/e2e8f0/475569?text=No+Image",
+        image: imageUrl,
         citizenId: citizenId,
         citizenName: citizenName,
         departmentId: analysis.departmentId,

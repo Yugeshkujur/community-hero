@@ -1,0 +1,123 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function currentUser() {
+      return get(userPath(request.auth.uid)).data;
+    }
+
+    function isCitizen() {
+      return signedIn() && currentUser().role == 'citizen';
+    }
+
+    function isAuthorityFor(departmentId) {
+      return signedIn()
+        && currentUser().role == 'authority'
+        && currentUser().departmentId == departmentId;
+    }
+
+    function serverComputedUserFields() {
+      return [
+        'badges',
+        'falseAlarms',
+        'points',
+        'rank',
+        'reportsCount',
+        'resolvedCount',
+        'trustScore',
+        'verifiedReports'
+      ];
+    }
+
+    function hasNoServerComputedUserFields() {
+      return !request.resource.data.keys().hasAny(serverComputedUserFields());
+    }
+
+    function serverComputedUserFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(serverComputedUserFields());
+    }
+
+    function userIdentityFieldsUnchanged() {
+      return request.resource.data.role == resource.data.role
+        && request.resource.data.phone == resource.data.phone
+        && request.resource.data.employeeId == resource.data.employeeId
+        && request.resource.data.departmentId == resource.data.departmentId;
+    }
+
+    function reportRoutingFieldsUnchanged() {
+      return request.resource.data.citizenId == resource.data.citizenId
+        && request.resource.data.departmentId == resource.data.departmentId
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    match /users/{userId} {
+      allow get: if signedIn() && request.auth.uid == userId;
+      allow list: if false;
+
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.id == userId
+        && request.resource.data.role in ['citizen', 'authority']
+        && hasNoServerComputedUserFields();
+
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && hasNoServerComputedUserFields()
+        && serverComputedUserFieldsUnchanged()
+        && userIdentityFieldsUnchanged();
+
+      allow delete: if false;
+    }
+
+    match /reports/{reportId} {
+      allow get, list: if signedIn()
+        && (
+          resource.data.citizenId == request.auth.uid
+          || isAuthorityFor(resource.data.departmentId)
+        );
+
+      allow create: if isCitizen()
+        && request.resource.data.id == reportId
+        && request.resource.data.citizenId == request.auth.uid;
+
+      allow update: if signedIn()
+        && reportRoutingFieldsUnchanged()
+        && (
+          (
+            isCitizen()
+            && resource.data.citizenId == request.auth.uid
+          )
+          || isAuthorityFor(resource.data.departmentId)
+        );
+
+      allow delete: if false;
+    }
+
+    match /leaderboard/{entryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /trustScores/{entryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /badges/{entryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

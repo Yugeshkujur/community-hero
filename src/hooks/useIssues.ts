@@ -1,23 +1,48 @@
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy, doc, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { MOCK_ISSUES } from '../data/mockData';
 import type { Issue } from '../data/mockData';
 import { stripUndefined } from '../lib/sanitize';
+import { useRole } from '../context/RoleContext';
 
 export function useIssues() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
+  const { currentUser, role, userData, loading: roleLoading } = useRole();
 
   useEffect(() => {
-    const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'));
+    if (roleLoading) {
+      return;
+    }
+
+    if (!currentUser || !role) {
+      setIssues([]);
+      setLoading(false);
+      return;
+    }
+
+    const reportConstraints =
+      role === 'authority'
+        ? userData?.departmentId
+          ? [where('departmentId', '==', userData.departmentId)]
+          : []
+        : [where('citizenId', '==', currentUser.uid)];
+
+    if (role === 'authority' && reportConstraints.length === 0) {
+      setIssues([]);
+      setLoading(false);
+      return;
+    }
+
+    const q = query(collection(db, 'reports'), ...reportConstraints);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedIssues: Issue[] = [];
       snapshot.forEach((doc) => {
         fetchedIssues.push({ id: doc.id, ...doc.data() } as Issue);
       });
-      setIssues(fetchedIssues);
+      setIssues(fetchedIssues.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       setLoading(false);
     }, (error) => {
       console.error("Error fetching issues:", error);
@@ -25,7 +50,7 @@ export function useIssues() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser, role, roleLoading, userData?.departmentId]);
 
   return { issues, loading };
 }

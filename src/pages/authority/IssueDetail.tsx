@@ -7,6 +7,8 @@ import SeverityBadge from '../../components/SeverityBadge';
 import AIRationalePanel from '../../components/AIRationalePanel';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { uploadResolvedIssueImage } from '../../lib/storage';
+import { useRole } from '../../context/RoleContext';
 
 const STATUS_ACTIONS: { label: string; next: IssueStatus; icon: string; color: string }[] = [
   { label: 'Acknowledge', next: 'Triaged', icon: 'visibility', color: 'border-outline-variant text-on-surface hover:bg-surface-variant/30' },
@@ -19,6 +21,7 @@ export default function AuthorityIssueDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { issues: mockIssues, loading } = useIssues();
+  const { userData } = useRole();
   
   const issue = mockIssues.find(i => i.id === id) ?? mockIssues[2];
 
@@ -73,7 +76,11 @@ export default function AuthorityIssueDetail() {
       if (nextStatus === 'Resolved') {
         updateData.resolvedAt = new Date().toISOString();
         if (resolvedImage) {
-          updateData.resolvedImage = resolvedImage;
+          updateData.resolvedImage = await uploadResolvedIssueImage(
+            userData?.departmentId || issue.departmentId,
+            issue.id,
+            resolvedImage
+          );
         }
       }
 

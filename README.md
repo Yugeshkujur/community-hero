@@ -3,13 +3,9 @@
 Community Hero is a modern civic engagement platform built for a hackathon. It allows citizens to report local issues (like potholes, broken streetlights, or water leaks) and uses an AI agent (powered by Gemini) to automatically classify, prioritize, and route these issues to the correct municipal departments.
 
 ## Tech Stack
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS
 - **Backend & Auth:** Firebase (Auth, Firestore, Storage)
-<<<<<<< HEAD
 - **AI Triage Agent:** Google Gemini (3.1-flash-lite) via `@google/generative-ai`
-=======
-- **AI Triage Agent:** Google Gemini(3.1-flash-lite) via `@google/generative-ai`
->>>>>>> b17a7c6 (some small changes)
 - **Mapping:** React-Leaflet
 
 ## Core Features

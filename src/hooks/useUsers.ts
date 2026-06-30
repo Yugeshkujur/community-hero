@@ -8,7 +8,7 @@ export function useUsers() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, 'users'));
+    const q = query(collection(db, 'leaderboard'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedUsers: User[] = [];
@@ -18,7 +18,7 @@ export function useUsers() {
       setUsers(fetchedUsers);
       setLoading(false);
     }, (error) => {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching leaderboard:", error);
       setLoading(false);
     });
 
