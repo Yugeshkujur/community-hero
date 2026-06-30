@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LEADERBOARD, type IssueStatus } from '../../data/mockData';
 import { useIssues } from '../../hooks/useIssues';
@@ -29,6 +29,12 @@ export default function AuthorityIssueDetail() {
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [noteSaved, setNoteSaved] = useState(false);
 
+  // Evidence Upload State
+  const [isResolvingMode, setIsResolvingMode] = useState(false);
+  const [resolvedImage, setResolvedImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (issue) {
       setCurrentStatus(issue.status);
@@ -47,13 +53,36 @@ export default function AuthorityIssueDetail() {
   const reporter = LEADERBOARD.find(u => u.id === issue.citizenId) ?? LEADERBOARD[2];
 
   async function handleStatusUpdate(nextStatus: IssueStatus) {
+    if (nextStatus === 'Resolved' && !isResolvingMode) {
+      setIsResolvingMode(true);
+      return;
+    }
+
+    if (nextStatus === 'Resolved' && !resolvedImage) {
+      setImageError('Proof photo is required to resolve this issue.');
+      return;
+    }
+
     setIsSavingStatus(true);
     try {
-      await updateDoc(doc(db, 'reports', issue.id), {
+      const updateData: any = {
         status: nextStatus,
         updatedAt: new Date().toISOString(),
-      });
+      };
+      
+      if (nextStatus === 'Resolved') {
+        updateData.resolvedAt = new Date().toISOString();
+        if (resolvedImage) {
+          updateData.resolvedImage = resolvedImage;
+        }
+      }
+
+      await updateDoc(doc(db, 'reports', issue.id), updateData);
+      
       setCurrentStatus(nextStatus);
+      if (nextStatus === 'Resolved') {
+        setIsResolvingMode(false);
+      }
     } catch (err) {
       console.error('Failed to update status:', err);
       alert('Failed to update status. Please try again.');
@@ -83,6 +112,51 @@ export default function AuthorityIssueDetail() {
     }
   }
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setImageError('');
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setImageError('File size exceeds 10MB. Please choose a smaller image.');
+        e.target.value = '';
+        return;
+      }
+
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        const MAX_WIDTH = 600;
+        const MAX_HEIGHT = 600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+        setResolvedImage(compressedBase64);
+        URL.revokeObjectURL(objectUrl);
+      };
+      img.src = objectUrl;
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto pb-10">
       {/* Back nav */}
@@ -97,16 +171,33 @@ export default function AuthorityIssueDetail() {
       <div className="grid md:grid-cols-3 gap-6">
         {/* Left: Main content */}
         <div className="md:col-span-2 space-y-4">
-          {/* Hero */}
-          <div className="rounded-xl overflow-hidden aspect-video relative border border-outline-variant shadow-sm">
-            <img className="w-full h-full object-cover" src={issue.image} alt={issue.title} />
-            <div className="absolute top-2 right-2 flex items-center gap-2">
-              <StatusChip status={currentStatus} showIcon />
-              <SeverityBadge severity={issue.severity} />
+          {/* Hero Image */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 rounded-xl overflow-hidden aspect-video relative border border-outline-variant shadow-sm">
+              <img className="w-full h-full object-cover" src={issue.image} alt={issue.title} />
+              <div className="absolute top-2 right-2 flex items-center gap-2">
+                <StatusChip status={currentStatus} showIcon />
+                <SeverityBadge severity={issue.severity} />
+              </div>
+              <div className="absolute bottom-2 left-2 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant shadow-sm">
+                <span className="font-label-sm text-label-sm text-on-surface">Before</span>
+              </div>
             </div>
-            <div className="absolute bottom-2 left-2 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant shadow-sm">
-              <span className="font-label-sm text-label-sm text-on-surface">{issue.trackingId}</span>
-            </div>
+            
+            {issue.resolvedImage && (
+              <div className="flex-1 rounded-xl overflow-hidden aspect-video relative border border-emerald-500/50 shadow-sm">
+                <img className="w-full h-full object-cover" src={issue.resolvedImage} alt="Resolved Proof" />
+                <div className="absolute top-2 right-2">
+                  <span className="bg-emerald-500 text-white font-label-sm text-label-sm px-2 py-1 rounded flex items-center gap-1 shadow-sm">
+                    <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                    Verified
+                  </span>
+                </div>
+                <div className="absolute bottom-2 left-2 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant shadow-sm">
+                  <span className="font-label-sm text-label-sm text-on-surface">After</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Title + Meta */}
@@ -179,20 +270,82 @@ export default function AuthorityIssueDetail() {
           {/* Status Actions */}
           <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
             <h3 className="font-label-lg text-label-lg text-on-surface mb-3">Update Status</h3>
-            <div className="space-y-2">
-              {STATUS_ACTIONS.map(action => (
-                <button
-                  key={action.next}
-                  onClick={() => handleStatusUpdate(action.next)}
-                  disabled={currentStatus === action.next || isSavingStatus}
-                  className={`w-full h-11 rounded-xl border font-label-lg text-label-lg flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${action.color}`}
-                >
-                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>{action.icon}</span>
-                  {isSavingStatus && currentStatus !== action.next ? 'Saving...' : action.label}
-                  {currentStatus === action.next && <span className="material-symbols-outlined text-[16px]">check</span>}
-                </button>
-              ))}
-            </div>
+            
+            {isResolvingMode ? (
+              <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                <h4 className="font-label-md text-label-md text-on-surface-variant flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                  Add Proof of Resolution
+                </h4>
+                
+                <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-sm bg-surface-container-high group flex items-center justify-center border-2 border-dashed border-outline-variant">
+                  {resolvedImage ? (
+                    <img
+                      className="w-full h-full object-cover"
+                      alt="Resolved evidence"
+                      src={resolvedImage}
+                    />
+                  ) : (
+                    <div className="text-center p-4">
+                      <span className="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">add_photo_alternate</span>
+                      <p className="font-label-sm text-label-sm text-on-surface-variant">Tap to upload photo</p>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                  />
+                  <div className="absolute inset-0 bg-black/10 hover:bg-black/20 flex items-end justify-center p-3 transition-colors cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                    <div className="bg-surface/90 backdrop-blur-sm text-on-surface font-label-sm text-label-sm px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                      <span className="material-symbols-outlined text-[16px]">{resolvedImage ? 'change_circle' : 'upload'}</span>
+                      {resolvedImage ? 'Change Photo' : 'Upload Proof'}
+                    </div>
+                  </div>
+                </div>
+                
+                {imageError && (
+                  <p className="font-label-sm text-label-sm text-red-500">{imageError}</p>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setIsResolvingMode(false);
+                      setResolvedImage(null);
+                      setImageError('');
+                    }}
+                    className="flex-1 h-11 border border-outline-variant rounded-xl font-label-lg text-label-lg text-on-surface hover:bg-surface-variant/30 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleStatusUpdate('Resolved')}
+                    disabled={!resolvedImage || isSavingStatus}
+                    className="flex-1 h-11 bg-emerald-500 text-white rounded-xl font-label-lg text-label-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isSavingStatus ? 'Saving...' : 'Confirm Resolution'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {STATUS_ACTIONS.map(action => (
+                  <button
+                    key={action.next}
+                    onClick={() => handleStatusUpdate(action.next)}
+                    disabled={currentStatus === action.next || isSavingStatus || (action.next === 'Resolved' && currentStatus === 'Resolved')}
+                    className={`w-full h-11 rounded-xl border font-label-lg text-label-lg flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${action.color}`}
+                  >
+                    <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>{action.icon}</span>
+                    {isSavingStatus && currentStatus !== action.next ? 'Saving...' : action.label}
+                    {currentStatus === action.next && <span className="material-symbols-outlined text-[16px]">check</span>}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Internal Note */}

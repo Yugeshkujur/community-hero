@@ -1,17 +1,83 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRole } from '../../context/RoleContext';
 import { DEPARTMENTS } from '../../data/mockData';
 import AvatarCustomizer from '../../components/AvatarCustomizer';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { useIssues } from '../../hooks/useIssues';
 
 export default function AuthorityProfile() {
   const navigate = useNavigate();
   const { setRole, currentUser, userData } = useRole();
   const uid = currentUser?.uid;
+  const { issues } = useIssues();
   
   const departmentName = DEPARTMENTS.find(d => d.id === userData?.departmentId)?.name || 'Government Department';
+
+  const myIssues = useMemo(() => {
+    return issues.filter(i => !userData?.departmentId || i.departmentId === userData.departmentId);
+  }, [issues, userData?.departmentId]);
+
+  const resolvedIssues = myIssues.filter(i => i.status === 'Resolved');
+  const issuesResolvedCount = resolvedIssues.length;
+
+  const avgResolution = useMemo(() => {
+    if (resolvedIssues.length === 0) return '—';
+    const totalHours = resolvedIssues.reduce((sum, i) => {
+      if (!i.resolvedAt) return sum; // fallback
+      return sum + (new Date(i.resolvedAt).getTime() - new Date(i.createdAt).getTime()) / (1000 * 60 * 60);
+    }, 0);
+    const avgH = totalHours / resolvedIssues.length;
+    return avgH > 24 ? (avgH / 24).toFixed(1) + ' Days' : Math.round(avgH) + ' Hours';
+  }, [resolvedIssues]);
+
+  const totalUpvotes = myIssues.reduce((sum, i) => sum + (i.upvotes || 0), 0);
+  const escalations = myIssues.filter(i => i.severity === 'Critical' && i.status !== 'Resolved').length;
+
+  const recentActivity = useMemo(() => {
+    return [...myIssues]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 5)
+      .map(i => {
+        let action = 'Updated Status';
+        let icon = 'update';
+        let color = 'text-amber-500';
+
+        if (i.status === 'Resolved') {
+          action = 'Resolved Issue';
+          icon = 'check_circle';
+          color = 'text-emerald-500';
+        } else if (i.status === 'Triaged') {
+          action = 'Triaged Issue';
+          icon = 'fact_check';
+          color = 'text-blue-500';
+        } else if (i.status === 'Reported') {
+          action = 'New Report';
+          icon = 'add_circle';
+          color = 'text-primary';
+        }
+
+        const diffMs = Date.now() - new Date(i.updatedAt).getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        
+        let time = 'just now';
+        if (diffDays > 0) time = `${diffDays} days ago`;
+        else if (diffHours > 0) time = `${diffHours} hours ago`;
+        else if (diffMins > 0) time = `${diffMins} mins ago`;
+
+        return {
+          id: i.id,
+          action,
+          target: `${i.trackingId} (${i.category})`,
+          time,
+          icon,
+          color
+        };
+      });
+  }, [myIssues]);
 
   const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.name || 'Authority'}`;
   const [avatarUrl, setAvatarUrl] = useState(userData?.avatar || defaultAvatar);
@@ -100,10 +166,10 @@ export default function AuthorityProfile() {
       {/* Performance Metrics */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Issues Resolved', value: '1,432', icon: 'check_circle', color: 'text-emerald-600', bg: 'bg-emerald-500/10' },
-          { label: 'Avg Resolution', value: '2.4 Days', icon: 'timer', color: 'text-blue-600', bg: 'bg-blue-500/10' },
-          { label: 'Citizen Rating', value: '4.8/5', icon: 'star', color: 'text-amber-500', bg: 'bg-amber-500/10' },
-          { label: 'Escalations', value: '3', icon: 'warning', color: 'text-red-600', bg: 'bg-red-500/10' },
+          { label: 'Issues Resolved', value: issuesResolvedCount, icon: 'check_circle', color: 'text-emerald-600', bg: 'bg-emerald-500/10' },
+          { label: 'Avg Resolution', value: avgResolution, icon: 'timer', color: 'text-blue-600', bg: 'bg-blue-500/10' },
+          { label: 'Citizen Upvotes', value: totalUpvotes, icon: 'thumb_up', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+          { label: 'Escalations', value: escalations, icon: 'warning', color: 'text-red-600', bg: 'bg-red-500/10' },
         ].map(stat => (
           <div key={stat.label} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${stat.bg}`}>
@@ -125,12 +191,8 @@ export default function AuthorityProfile() {
           <Link to="/authority" className="text-primary font-label-sm text-label-sm hover:underline">View All</Link>
         </div>
         <div className="divide-y divide-outline-variant/50">
-          {[
-            { action: 'Resolved Issue', target: 'CH-2024-045 (Broken Streetlight)', time: '2 hours ago', icon: 'check_circle', color: 'text-emerald-500' },
-            { action: 'Reassigned Issue', target: 'CH-2024-048 (Water Leak) to Plumbing', time: '5 hours ago', icon: 'forward', color: 'text-blue-500' },
-            { action: 'Updated Status', target: 'CH-2024-042 (Pothole) to In Progress', time: '1 day ago', icon: 'update', color: 'text-amber-500' },
-          ].map((log, i) => (
-            <div key={i} className="px-6 py-4 flex gap-4 hover:bg-surface-container/20 transition-colors">
+          {recentActivity.map((log) => (
+            <div key={log.id} className="px-6 py-4 flex gap-4 hover:bg-surface-container/20 transition-colors">
               <span className={`material-symbols-outlined ${log.color} mt-0.5`} style={{ fontVariationSettings: "'FILL' 1" }}>{log.icon}</span>
               <div>
                 <p className="font-body-md text-body-md text-on-surface">
@@ -140,6 +202,11 @@ export default function AuthorityProfile() {
               </div>
             </div>
           ))}
+          {recentActivity.length === 0 && (
+            <div className="p-6 text-center text-on-surface-variant font-body-sm text-body-sm">
+               No recent activity found.
+            </div>
+          )}
         </div>
       </section>
 

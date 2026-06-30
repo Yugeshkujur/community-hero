@@ -28,6 +28,7 @@ export interface Issue {
   createdAt: string;
   updatedAt: string;
   resolvedAt?: string;
+  resolvedImage?: string;
   slaDeadline: string;
   trackingId: string;
   aiConfidence: number;

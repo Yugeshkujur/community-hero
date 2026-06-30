@@ -110,15 +110,37 @@ export default function IssueTracking() {
           </div>
         )}
 
-        {/* Hero Image */}
-        <div className="rounded-xl overflow-hidden aspect-video relative border border-outline-variant/30 shadow-sm">
-          <img className="w-full h-full object-cover" src={issue.image} alt={issue.title} />
-          <div className="absolute top-2 right-2">
-            <StatusChip status={issue.status} showIcon />
+        {/* Evidence Images */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 rounded-xl overflow-hidden aspect-video relative border border-outline-variant/30 shadow-sm">
+            <img className="w-full h-full object-cover" src={issue.image} alt={issue.title} />
+            <div className="absolute top-2 right-2">
+              <StatusChip status={issue.status} showIcon />
+            </div>
+            <div className="absolute top-2 left-2">
+              <SeverityBadge severity={issue.severity} />
+            </div>
+            {issue.resolvedImage && (
+              <div className="absolute bottom-2 left-2 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant shadow-sm">
+                <span className="font-label-sm text-label-sm text-on-surface">Before</span>
+              </div>
+            )}
           </div>
-          <div className="absolute top-2 left-2">
-            <SeverityBadge severity={issue.severity} />
-          </div>
+
+          {issue.resolvedImage && (
+            <div className="flex-1 rounded-xl overflow-hidden aspect-video relative border border-emerald-500/50 shadow-sm">
+              <img className="w-full h-full object-cover" src={issue.resolvedImage} alt="Resolved Proof" />
+              <div className="absolute top-2 right-2">
+                <span className="bg-emerald-500 text-white font-label-sm text-label-sm px-2 py-1 rounded flex items-center gap-1 shadow-sm">
+                  <span className="material-symbols-outlined text-[14px]">verified</span>
+                  Verified
+                </span>
+              </div>
+              <div className="absolute bottom-2 left-2 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant shadow-sm">
+                <span className="font-label-sm text-label-sm text-on-surface">After</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Header Info */}
