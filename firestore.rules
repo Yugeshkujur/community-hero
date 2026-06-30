@@ -81,7 +81,7 @@ service cloud.firestore {
       allow get, list: if signedIn()
         && (
           resource.data.citizenId == request.auth.uid
-          || isAuthorityFor(resource.data.departmentId)
+          || currentUser().role == 'authority'
         );
 
       allow create: if isCitizen()
@@ -95,7 +95,7 @@ service cloud.firestore {
             isCitizen()
             && resource.data.citizenId == request.auth.uid
           )
-          || isAuthorityFor(resource.data.departmentId)
+          || currentUser().role == 'authority'
         );
 
       allow delete: if false;

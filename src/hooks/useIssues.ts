@@ -24,16 +24,8 @@ export function useIssues() {
 
     const reportConstraints =
       role === 'authority'
-        ? userData?.departmentId
-          ? [where('departmentId', '==', userData.departmentId)]
-          : []
+        ? [] // Authorities see all issues, they can filter via UI
         : [where('citizenId', '==', currentUser.uid)];
-
-    if (role === 'authority' && reportConstraints.length === 0) {
-      setIssues([]);
-      setLoading(false);
-      return;
-    }
 
     const q = query(collection(db, 'reports'), ...reportConstraints);
 

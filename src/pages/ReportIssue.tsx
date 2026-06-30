@@ -154,7 +154,13 @@ export default function ReportIssue() {
       // Reverse geocode to get a precise, readable location
       let readableLocation = "Captured Location";
       try {
-        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${mapCenter[0]}&lon=${mapCenter[1]}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${mapCenter[0]}&lon=${mapCenter[1]}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
         if (geoRes.ok) {
           const geoData = await geoRes.json();
           if (geoData && geoData.display_name) {
@@ -164,12 +170,24 @@ export default function ReportIssue() {
           }
         }
       } catch (e) {
-        console.warn("Reverse geocoding failed", e);
+        console.warn("Reverse geocoding failed or timed out", e);
       }
 
-      const imageUrl = base64Image
-        ? await uploadIssueImage(citizenId, newId, base64Image)
-        : "https://placehold.co/600x400/e2e8f0/475569?text=No+Image";
+      let imageUrl = "https://placehold.co/600x400/e2e8f0/475569?text=No+Image";
+      if (base64Image) {
+        try {
+          // Firebase Storage SDK retries CORS/network errors with exponential backoff, which can hang the UI for 30+ seconds.
+          // We enforce a strict 3-second timeout here. If it doesn't upload by then, we skip it.
+          const uploadPromise = uploadIssueImage(citizenId, newId, base64Image);
+          const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Upload timeout")), 3000));
+          imageUrl = await Promise.race([uploadPromise, timeoutPromise]);
+        } catch (uploadErr) {
+          console.warn("Firebase Storage failed/timed out. Falling back to storing the compressed base64 string directly in Firestore.", uploadErr);
+          // Since the canvas resizes the image to 1280px at 80% JPEG quality, the base64 string is usually ~200-400KB.
+          // This safely fits under Firestore's 1MB document limit, allowing images to work without a Blaze plan.
+          imageUrl = base64Image;
+        }
+      }
 
       // 3. Construct Issue
       const issue: Issue = {
